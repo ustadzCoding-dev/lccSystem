@@ -85,8 +85,3 @@ Catatan: jangan menyimpan nilai-nilai sensitif (SECRET_KEY, credentials) di repo
 1. Buat branch baru: `git checkout -b feat/my-change`
 2. Buat perubahan, tambahkan test bila perlu.
 3. Commit dengan pesan yang jelas, lalu buka pull request.
-
-## Security
-
-- Gantilah `SECRET_KEY` default sebelum deploy ke production.
-- Jangan commit kredensial, file `.env`, atau file database.
