@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-cogs"></i> Manajemen Babak</h2>
+        </div>
+        <div class="card-body">
+            <!-- Form Tambah Babak Baru -->
+            <div class="add-babak-section mb-4">
+                <h3><i class="fas fa-plus-circle"></i> Tambah Babak Baru</h3>
+                <form action="{{ url_for('add_babak') }}" method="POST" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="nama_babak" class="form-label">Nama Babak</label>
+                        <input type="text" class="form-control" id="nama_babak" name="nama_babak" 
+                               placeholder="Contoh: Babak Penyisihan" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="jumlah_soal" class="form-label">Jumlah Soal</label>
+                        <input type="number" class="form-control" id="jumlah_soal" name="jumlah_soal" 
+                               value="5" min="1" required>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-plus"></i> Tambah
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Daftar Babak -->
+            <div class="babak-list">
+                <h3><i class="fas fa-list"></i> Daftar Babak</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Nama Babak</th>
+                                <th>Jumlah Soal</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for config in configs %}
+                            <tr>
+                                <td>{{ config.babak }}</td>
+                                <td>
+                                    <form action="{{ url_for('update_nama_babak', babak_id=config.id) }}" 
+                                          method="POST" class="edit-nama-form">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="nama_babak" 
+                                                   value="{{ config.nama_babak }}" required>
+                                            <button type="submit" class="btn btn-outline-primary">
+                                                <i class="fas fa-save"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </td>
+                                <td>{{ config.jumlah_soal }}</td>
+                                <td>
+                                    <span class="badge {% if config.active %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ 'Aktif' if config.active else 'Nonaktif' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <form action="{{ url_for('toggle_babak', babak_id=config.id) }}" 
+                                          method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm 
+                                            {% if config.active %}btn-warning{% else %}btn-success{% endif %}">
+                                            <i class="fas {% if config.active %}fa-toggle-off{% else %}fa-toggle-on{% endif %}"></i>
+                                            {{ 'Nonaktifkan' if config.active else 'Aktifkan' }}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali ke Halaman Utama
+        </a>
+    </div>
+</div>
+{% endblock %}

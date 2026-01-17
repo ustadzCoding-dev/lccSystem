@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Search and Export Section -->
+    <div class="top-actions">
+        <div class="search-box">
+            <form action="{{ url_for('search') }}" method="GET" class="search-form">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Cari tim atau anggota..." 
+                           value="{{ request.args.get('q', '') }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    {% if request.args.get('q') %}
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+        <div class="export-section">
+            <a href="{{ url_for('export_excel') }}" class="btn btn-success">
+                <i class="fas fa-file-excel"></i> Export ke Excel
+            </a>
+        </div>
+    </div>
+
+    <!-- Form Tambah Tim -->
+    <div class="card add-team-card">
+        <div class="card-header">
+            <h2><i class="fas fa-users"></i> Tambah Tim Baru</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('add_team') }}" class="add-team-form">
+                <div class="row">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="form-group">
+                            <label for="name"><i class="fas fa-flag"></i> Nama Tim</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="form-group">
+                            <label for="member1"><i class="fas fa-user"></i> Anggota 1</label>
+                            <input type="text" class="form-control" id="member1" name="member1" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="form-group">
+                            <label for="member2"><i class="fas fa-user"></i> Anggota 2</label>
+                            <input type="text" class="form-control" id="member2" name="member2" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="form-group">
+                            <label for="member3"><i class="fas fa-user"></i> Anggota 3</label>
+                            <input type="text" class="form-control" id="member3" name="member3" required>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus"></i> Tambah Tim
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Konfigurasi Babak -->
+    <div class="card config-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-cog"></i> Konfigurasi Babak</h2>
+            <a href="{{ url_for('manage_babak') }}" class="btn btn-primary">
+                <i class="fas fa-cogs"></i> Kelola Babak
+            </a>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('update_babak_config') }}">
+                <div class="row">
+                    {% for config in configs %}
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="babak{{ config.babak }}">
+                                <i class="fas fa-list-ol"></i> Jumlah Soal {{ config.nama_babak }}
+                            </label>
+                            <input type="number" class="form-control" id="babak{{ config.babak }}" 
+                                   name="babak{{ config.babak }}" value="{{ config.jumlah_soal }}" min="1">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">
+                    <i class="fas fa-save"></i> Simpan Konfigurasi
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Daftar Tim -->
+    <div class="teams-section">
+        <h2><i class="fas fa-trophy"></i> Daftar Tim</h2>
+        <div class="row">
+            {% for team in teams %}
+            <div class="col-md-6 col-lg-4">
+                <div class="team-card">
+                    <div class="team-header">
+                        <h3>{{ team.name }}</h3>
+                        <div class="team-controls">
+                            <a href="{{ url_for('edit_team', team_id=team.id) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{{ url_for('delete_team', team_id=team.id) }}" 
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Yakin ingin menghapus tim ini?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="team-members">
+                        <div class="member"><i class="fas fa-user"></i> {{ team.member1 }}</div>
+                        <div class="member"><i class="fas fa-user"></i> {{ team.member2 }}</div>
+                        <div class="member"><i class="fas fa-user"></i> {{ team.member3 }}</div>
+                    </div>
+
+                    <div class="team-scores">
+                        {% for config in configs %}
+                        <div class="score-section">
+                            <h4>{{ config.nama_babak }}</h4>
+                            <form method="POST" action="{{ url_for('update_score', team_id=team.id, babak=config.babak) }}">
+                                <div class="score-inputs">
+                                    {% for i in range(config.jumlah_soal) %}
+                                    <div class="score-input-group">
+                                        <label class="small">Soal {{ i+1 }}</label>
+                                        <input type="number" class="form-control score-input" 
+                                               name="nilai{{ i+1 }}"
+                                               value="{{ team.get_nilai_soal(config.babak, i+1) }}" min="0">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="score-actions">
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        <i class="fas fa-save"></i> Update
+                                    </button>
+                                    <a href="{{ url_for('reset_babak', team_id=team.id, babak=config.babak) }}" 
+                                       class="btn btn-sm btn-warning"
+                                       onclick="return confirm('Reset nilai {{ config.nama_babak }}?')">
+                                        <i class="fas fa-undo"></i> Reset
+                                    </a>
+                                </div>
+                            </form>
+                            <div class="babak-total">
+                                Total {{ config.nama_babak }}: {{ team['score_babak' ~ config.babak] }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="total-score">
+                        <i class="fas fa-star"></i> Total Skor: {{ team.total_score }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

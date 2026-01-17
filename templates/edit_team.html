@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Tim - Sistem Penilaian LCCS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+            </div>
+            <h1>Edit Tim</h1>
+        </div>
+    </div>
+
+    <div class="container main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card edit-team-card">
+            <div class="card-header">
+                <h2><i class="fas fa-users"></i> Edit Tim: {{ team.name }}</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('edit_team', team_id=team.id) }}" class="edit-team-form">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="form-group">
+                                <label for="name">
+                                    <i class="fas fa-flag"></i> Nama Tim
+                                </label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ team.name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="form-group">
+                                <label for="member1">
+                                    <i class="fas fa-user"></i> Anggota 1
+                                </label>
+                                <input type="text" class="form-control" id="member1" name="member1" value="{{ team.member1 }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="form-group">
+                                <label for="member2">
+                                    <i class="fas fa-user"></i> Anggota 2
+                                </label>
+                                <input type="text" class="form-control" id="member2" name="member2" value="{{ team.member2 }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="form-group">
+                                <label for="member3">
+                                    <i class="fas fa-user"></i> Anggota 3
+                                </label>
+                                <input type="text" class="form-control" id="member3" name="member3" value="{{ team.member3 }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Simpan Perubahan
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-logos">
+                <img src="{{ url_for('static', filename='logo_mahad.png') }}" alt="Logo Mahad" class="footer-logo">
+            </div>
+            <p>&copy; 2025 Sistem Penilaian LCCS</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
